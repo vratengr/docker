@@ -59,6 +59,6 @@ RUN service apache2 restart
 #           ps: if you're using github with https, make sure the repo is public
 # RUN apt-get -y install git \
 #     && cd /var/www \
-#     && git clone https://github.com/vratengr/sample.git html \
+#     && git clone <your-repo> html \
 #     && chown -R 1000:1000 html
 ############################################################
