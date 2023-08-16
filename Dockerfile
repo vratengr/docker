@@ -33,14 +33,16 @@ COPY config/cert/* /etc/ssl/certs/.
 
 # add a new vhost file for our new app
 COPY config/vhost.conf /etc/apache2/sites-available/.
-# then enable the new vhost <vhost is the filename of the new .conf file>
+# then enable the new vhost <vhost is the filename of the new .conf file>, this will create a file in the /etc/apache2/sites-enabled folder
 RUN a2ensite vhost
-# and enable necessary modules needed in our vhost, this will create a file in the /etc/apache2/sites-enabled folder
+# and enable necessary modules needed for the ssl portion of our vhost
 RUN a2enmod ssl
+# enable rewrite module if necessary (eg: using htaccess)
+# RUN a2enmod rewrite
 
 # add a new conf for the servername, this is to fix warnings about fully qualified domain name could not be determined
 COPY config/servername.conf /etc/apache2/conf-available/.
-# then enable the new conf
+# then enable the new conf, this will create a file in /etc/apache2/conf-enabled folder
 RUN a2enconf servername
 
 # restart apache since there are server changes
@@ -57,6 +59,7 @@ RUN service apache2 restart
 # option 3: clone a repo into apache's web directory, you may clone by ssh but make sure to setup the ssh keys and config
 #           I'm using https for poduction since we won't really be pushing in the production server and we also don't want it to be bound in our host files as incidental changes will go thru live
 #           ps: if you're using github with https, make sure the repo is public
+#           user:group 1000 is to allow host system to edit files in the mounted volume in the container
 # RUN apt-get -y install git \
 #     && cd /var/www \
 #     && git clone <your-repo> html \

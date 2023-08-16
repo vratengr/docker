@@ -16,9 +16,10 @@ services:
       networks:
         - docker-network # <network-name>
       # ports:
-      #   - 9001:3306
+      #   - 9004:3306
       volumes:
         - ./config/db:/docker-entrypoint-initdb.d/ # <source folder>:/docker-entrypoint-initdb.d/ - this will dump all the .sql or tar files in source folder
+      # - ./config/db/data.sql:/docker-entrypoint-initdb.d/data.sql # dump specific file
         - dbdata:/var/lib/mysql # <volume name>:<mapped location within the container>
       environment:
         MARIADB_ROOT_PASSWORD : root # <root-password>
@@ -32,17 +33,19 @@ services:
       networks:
         - docker-network
       ports:
-        - 8001:80 # map TCP port 80 to xxxx
-        - 4001:443 # map SSL port 443 to xxx
+        - 8004:80 # map TCP port 80 to xxxx
+        - 4004:443 # map SSL port 443 to xxx
+        # - "0.0.0.0:4004:443" # other format to specify the port mapping
       volumes:
         - ./html:/var/www/html # ./<source code directory>:<apache web directory within the container> - this is a two-way binding, so what happens in the container happens in the source
       depends_on:
         - db # <service name for our database> - this is to specify dependency/requirements, our app requires the db container for it to work
+      # depends_on: [db] # other format to specify depends_on
       build: # there may be cases where you need to customize an image from Docker Hub, so instead of specifying an image for this service, we will define the image via the Dockerfile
         context: . # path to where the Dockerfile resides
         dockerfile: Dockerfile # name of the Dockerfile, default is Dockerfile, you can omit this if you follow the standard naming
       extra_hosts:
-        - "vratengr.com:127.0.0.1" # this adds an entry in /etc/hosts
+        - "vratengr.com:127.0.0.1" # this adds an entry in /etc/hosts, note that in Windows using WSL, you should also add an entry in Window's hosts file (C:\Windows\System32\drivers\etc\hosts)
 
     phpmyadmin: # optional if you want to have GUI for your database
       container_name: docker-phpmyadmin
@@ -51,12 +54,13 @@ services:
       networks:
         - docker-network
       ports:
-        - 5001:80
+        - 5004:80
       depends_on:
         - db
 
 networks: # an app usually needs multiple services to function, defining a network groups these services to create the app environment
-  docker-network:
+  docker-network: # <network-name> - in Docker Dsektop, this will be prepended with the folder name
+    # driver: bridge # bridge is the default driver, so you can omit this line
 
 volumes: # we are going to persist the db data using volumes so that even if you stop the container, the data will persist within docker
-  dbdata:
+  dbdata: # <volume-name> - in Docker Dsektop, this will be prepended with the folder name
