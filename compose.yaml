@@ -12,7 +12,7 @@ services:
     db: # service name for our database and can be customized per your setup
       container_name: docker-mariadb # <container-name>
       image: mariadb:11.0 # https://hub.docker.com/_/mariadb
-      restart: always # restarts the service whenever any defined configuration changes 
+      restart: always # restarts the service whenever any defined configuration changes
       networks:
         - docker-network # <network-name>
       # ports:
@@ -23,7 +23,7 @@ services:
         - dbdata:/var/lib/mysql # <volume name>:<mapped location within the container>
       environment:
         MARIADB_ROOT_PASSWORD : root # <root-password>
-        MARIADB_DATABASE: mydb # <database-name>
+        MARIADB_DATABASE: docker # <database-name>
         MARIADB_USER : user # <database-user>
         MARIADB_PASSWORD : user # <user-password>
 
@@ -38,6 +38,7 @@ services:
         # - "0.0.0.0:4004:443" # other format to specify the port mapping
       volumes:
         - ./html:/var/www/html # ./<source code directory>:<apache web directory within the container> - this is a two-way binding, so what happens in the container happens in the source
+        # - ./config/vhost.conf:/etc/apache2/sites-enabled/000-default.conf # this mounts vhost.conf as 000-default.conf, so it puts it directly in sites-enabled
       depends_on:
         - db # <service name for our database> - this is to specify dependency/requirements, our app requires the db container for it to work
       # depends_on: [db] # other format to specify depends_on
